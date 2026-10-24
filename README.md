@@ -43,30 +43,21 @@ A CV served two ways from one private S3 bucket — once by an **EC2** web serve
 
 <img src="https://img.shields.io/badge/-System_Design-6366F1?style=flat-square" alt="System Design"/>
 
-```
-                         ┌──────────────────────────────┐
-                         │      S3 Bucket (private)       │
-                         │      cv-23l-3065/site/          │
-                         │  index.html · style.css · cv.pdf│
-                         └───────────────┬──────────────────┘
-                  GetObject + ListBucket  │  GetObject only
-                  (prefix: site/)         │  (no ListBucket)
-                                          │
-              ┌────────────────────────────┴────────────────────────────┐
-              │                                                          │
-   ┌──────────▼───────────┐                               ┌──────────────▼──────────────┐
-   │     EC2 Instance        │                               │      Lambda Function         │
-   │   cv-ec2-23l-3065       │                               │    cv-func-23l-3065          │
-   │   IAM Role attached      │                               │    IAM Role attached          │
-   │   Apache httpd            │                               │    Python 3.13                │
-   │   synced every 5 min       │                               │    reads S3 per request        │
-   └──────────┬───────────┘                               └──────────────┬──────────────┘
-              │                                                          │
-        Public IP · HTTP                                     Public Function URL · HTTPS
-              │                                                          │
-         ┌────▼─────┐                                               ┌────▼─────┐
-         │  Browser  │                                               │  Browser  │
-         └───────────┘                                               └───────────┘
+```mermaid
+flowchart TB
+    S3[("S3 Bucket (private)<br/>cv-23l-3065/site/<br/>index.html · style.css · cv.pdf")]
+
+    EC2["EC2 Instance<br/>cv-ec2-23l-3065<br/>IAM Role attached<br/>Apache httpd<br/>synced every 5 min"]
+    Lambda["Lambda Function<br/>cv-func-23l-3065<br/>IAM Role attached<br/>Python 3.13<br/>reads S3 per request"]
+
+    BrowserA(["Browser"])
+    BrowserB(["Browser"])
+
+    S3 -- "GetObject + ListBucket<br/>(prefix: site/)" --> EC2
+    S3 -- "GetObject only<br/>(no ListBucket)" --> Lambda
+
+    EC2 -- "Public IP · HTTP" --> BrowserA
+    Lambda -- "Public Function URL · HTTPS" --> BrowserB
 ```
 
 **EC2 path:** A browser request hits the instance's public IP on port 80. Apache serves static files that a systemd timer syncs from the private S3 bucket every 5 minutes, using the EC2 IAM role.
