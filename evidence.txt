@@ -1,0 +1,180 @@
+== caller ==
+{
+    "UserId": "AIDAYOVDUP5JM5LDTTYQ7",
+    "Account": "581237505874",
+    "Arn": "arn:aws:iam::581237505874:user/Jabeen-Zahra"
+}
+== public-access ==
+{
+    "PublicAccessBlockConfiguration": {
+        "BlockPublicAcls": true,
+        "IgnorePublicAcls": true,
+        "BlockPublicPolicy": true,
+        "RestrictPublicBuckets": true
+    }
+}
+== versioning ==
+{
+    "Status": "Enabled"
+}
+== objects ==
+2026-10-24 01:12:55      88211 cv.pdf
+2026-10-24 01:12:42       8354 index.html
+2026-10-24 01:12:47       2125 style.css
+== ec2-policy ==
+{
+    "RoleName": "cv-ec2-role-23l-3065",
+    "PolicyName": "cv-ec2-s3-access",
+    "PolicyDocument": {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "GetObjects",
+                "Effect": "Allow",
+                "Action": "s3:GetObject",
+                "Resource": "arn:aws:s3:::cv-23l-3065/site/*"
+            },
+            {
+                "Sid": "ListWithPrefix",
+                "Effect": "Allow",
+                "Action": "s3:ListBucket",
+                "Resource": "arn:aws:s3:::cv-23l-3065",
+                "Condition": {
+                    "StringLike": {
+                        "s3:prefix": "site/*"
+                    }
+                }
+            }
+        ]
+    }
+}
+== lambda-policy ==
+{
+    "AttachedPolicies": [
+        {
+            "PolicyName": "AWSLambdaBasicExecutionRole",
+            "PolicyArn": "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        }
+    ]
+}
+{
+    "RoleName": "cv-lambda-role-23l-3065",
+    "PolicyName": "cv-lambda-s3-access",
+    "PolicyDocument": {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "GetObjects",
+                "Effect": "Allow",
+                "Action": "s3:GetObject",
+                "Resource": "arn:aws:s3:::cv-23l-3065/site/*"
+            }
+        ]
+    }
+}
+== security-group ==
+{
+    "SecurityGroups": [
+        {
+            "GroupId": "sg-0846ff62992c08334",
+            "IpPermissionsEgress": [
+                {
+                    "IpProtocol": "-1",
+                    "UserIdGroupPairs": [],
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0"
+                        }
+                    ],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ],
+            "Tags": [
+                {
+                    "Key": "Course",
+                    "Value": "cloud"
+                },
+                {
+                    "Key": "Owner",
+                    "Value": "23l-3065"
+                }
+            ],
+            "VpcId": "vpc-02e7e82293911189e",
+            "SecurityGroupArn": "arn:aws:ec2:ap-southeast-2:581237505874:security-group/sg-0846ff62992c08334",
+            "OwnerId": "581237505874",
+            "GroupName": "cv-sg-23l-3065",
+            "Description": "CV EC2 security group",
+            "IpPermissions": [
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 80,
+                    "ToPort": 80,
+                    "UserIdGroupPairs": [],
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0"
+                        }
+                    ],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                },
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 22,
+                    "ToPort": 22,
+                    "UserIdGroupPairs": [],
+                    "IpRanges": [
+                        {
+                            "CidrIp": "39.37.190.98/32"
+                        }
+                    ],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ]
+        }
+    ]
+}
+== instance ==
+{
+    "Type": "t3.micro",
+    "IMDS": "required",
+    "Profile": "arn:aws:iam::581237505874:instance-profile/cv-ec2-role-23l-3065"
+}
+== endpoints ==
+--- EC2 ---
+HTTP Status: 200
+Content-Type: text/html; charset=UTF-8
+--- Lambda ---
+HTTP Status: 200
+Content-Type: text/html
+--- Direct S3 (should be denied) ---
+HTTP Status: 403
+== lambda-logs ==
+2026-10-24T16:06:15.495000+00:00 2026/10/24/[$LATEST]812776270e7e4f468d154b1b64f681bf INIT_START Runtime Version: python:3.13.mainlinev2.v43	Runtime Version ARN: arn:aws:lambda:ap-southeast-2::runtime:a0627e8616c4eaf447133f427c7419e5ce3a39ea2bc648ccb6d03d5b7f4d96e7
+2026-10-24T16:06:15.965000+00:00 2026/10/24/[$LATEST]812776270e7e4f468d154b1b64f681bf START RequestId: ae22bcf6-cbd9-4265-b6be-fed75b09433b Version: $LATEST
+2026-10-24T16:06:16.248000+00:00 2026/10/24/[$LATEST]812776270e7e4f468d154b1b64f681bf {"fn": "cv-func-23l-3065", "path": "/", "status": 200, "ms": 281}
+2026-10-24T16:06:16.269000+00:00 2026/10/24/[$LATEST]812776270e7e4f468d154b1b64f681bf END RequestId: ae22bcf6-cbd9-4265-b6be-fed75b09433b
+2026-10-24T16:06:16.269000+00:00 2026/10/24/[$LATEST]812776270e7e4f468d154b1b64f681bf REPORT RequestId: ae22bcf6-cbd9-4265-b6be-fed75b09433b	Duration: 303.04 ms	Billed Duration: 771 ms	Memory Size: 128 MB	Max Memory Used: 96 MB	Init Duration: 467.05 ms
+2026-10-24T16:09:02.416000+00:00 2026/10/24/[$LATEST]812776270e7e4f468d154b1b64f681bf START RequestId: a141a2c3-c9a0-47ce-90a6-e446575c943a Version: $LATEST
+2026-10-24T16:09:02.661000+00:00 2026/10/24/[$LATEST]812776270e7e4f468d154b1b64f681bf {"fn": "cv-func-23l-3065", "path": "/", "status": 200, "ms": 232}
+2026-10-24T16:09:02.669000+00:00 2026/10/24/[$LATEST]812776270e7e4f468d154b1b64f681bf END RequestId: a141a2c3-c9a0-47ce-90a6-e446575c943a
+2026-10-24T16:09:02.669000+00:00 2026/10/24/[$LATEST]812776270e7e4f468d154b1b64f681bf REPORT RequestId: a141a2c3-c9a0-47ce-90a6-e446575c943a	Duration: 253.00 ms	Billed Duration: 253 ms	Memory Size: 128 MB	Max Memory Used: 96 MB
+== log-retention ==
+{
+    "logGroups": [
+        {
+            "logGroupName": "/aws/lambda/cv-func-23l-3065",
+            "creationTime": 1792857558002,
+            "retentionInDays": 7,
+            "metricFilterCount": 0,
+            "arn": "arn:aws:logs:ap-southeast-2:581237505874:log-group:/aws/lambda/cv-func-23l-3065:*",
+            "storedBytes": 0,
+            "logGroupClass": "STANDARD",
+            "logGroupArn": "arn:aws:logs:ap-southeast-2:581237505874:log-group:/aws/lambda/cv-func-23l-3065",
+            "deletionProtectionEnabled": false,
+            "bearerTokenAuthenticationEnabled": false
+        }
+    ]
+}
